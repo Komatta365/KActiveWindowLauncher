@@ -1,0 +1,84 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            // 現在開いているファイルを Visual Studio で開くタスク
+            // KVisualStudioOpenFile.exe を使い、ファイルパス・行・列を渡して VS 側でジャンプする
+            "label": "visual-studio-open-file",
+            "type": "shell",
+            "command": "D:\\repository\\Github\\Komatta365\\VSTools\\KVisualStudioOpenFile\\KVisualStudioOpenFile\\bin\\Release\\net10.0\\KVisualStudioOpenFile.exe",
+            "args": [
+                "-s",
+                "KProfiler",          // ソリューション名
+                "-f",
+                "${file},${lineNumber},${columnNumber}"  // 開くファイル・行番号・列番号
+            ]
+        },
+        {
+            // 動作確認用のエコータスク
+            "label": "echo Komax",
+            "type": "shell",
+            "command": "echo Hello Komax2",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            // ソースファイルのエンコーディングを一括変換するタスク
+            // Source/Script/convert_encoding.py を実行する
+            "label": "Convert Encoding",
+            "type": "shell",
+            "options": {
+                // スクリプトをワークスペースルートから実行する
+                "cwd": "${workspaceFolder}"
+            },
+            "command": "python",
+            "args": ["Source/Script/convert_encoding.py"],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Intermediate/ProjectFile/KProfiler.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/Intermediate/ProjectFile/KProfiler.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/Intermediate/ProjectFile/KProfiler.sln"
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

@@ -1,0 +1,45 @@
+{
+    // VS Code デバッグ設定のバージョン（固定値）
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // ---------------------------------------------------------------------
+            // Excel2FlatBuffers ユニットテスト — コンソール起動構成
+            // 属性一覧: https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md
+            // IntelliSense で各属性の補完・ホバー説明が利用可能
+            // ---------------------------------------------------------------------
+            // デバッグ構成の表示名（実行/デバッグパネルのドロップダウンに表示される）
+            "name": ".NET Core Launch (console)",
+            // デバッガーの種別（.NET CoreCLR ランタイム用）
+            "type": "coreclr",
+            // 新しいプロセスを起動してデバッグ開始
+            "request": "launch",
+            // 起動前に実行する VS Code タスク名（tasks.json の "build" ラベルに対応）
+            "preLaunchTask": "build",
+            // デバッグ対象の実行ファイルパス
+            // ターゲットフレームワークを変更した場合は net9.0 の部分を合わせて更新すること
+            "program": "${workspaceFolder}/Intermediate/ProjectFile/Tool/excel2flatbuffersunittest/output/net9.0/Excel2FlatBuffersUnitTest.dll",
+            // プログラムに渡すコマンドライン引数（現在は未指定）
+            "args": [],
+            // プロセスの作業ディレクトリ（相対パス解決の基点）
+            "cwd": "${workspaceFolder}/Intermediate/ProjectFile/Tool/excel2flatbuffersunittest",
+            // 標準入出力の表示先（"internalConsole": VS Code のデバッグコンソール）
+            // 詳細: https://aka.ms/VSCode-CS-LaunchJson-Console
+            "console": "internalConsole",
+            // エントリポイントで自動的に停止しない（true にするとメイン先頭でブレーク）
+            "stopAtEntry": false
+        },
+        {
+            // ---------------------------------------------------------------------
+            // 実行中プロセスへのアタッチ構成
+            // 実行中の .NET プロセスを選択してデバッガーをアタッチする
+            // ---------------------------------------------------------------------
+            // デバッグ構成の表示名
+            "name": ".NET Core Attach",
+            // デバッガーの種別（.NET CoreCLR ランタイム用）
+            "type": "coreclr",
+            // 既存プロセスにアタッチするモード
+            "request": "attach"
+        }
+    ]
+}

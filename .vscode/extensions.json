@@ -1,0 +1,140 @@
+{
+    // ============================================================
+    // VS Code 推奨拡張機能リスト
+    // このファイルに記載された拡張機能は、ワークスペースを開いた際に
+    // VS Code からインストールを促す通知が表示されます。
+    // 新しいメンバーの環境構築を統一するために使用します。
+    //
+    // recommendations          : インストールを推奨する拡張機能の ID リスト。
+    //                            ワークスペースを開いたとき、未インストールの場合に
+    //                            VS Code がインストールを促す通知を表示します。
+    // unwantedRecommendations  : このプロジェクトで使用を推奨しない拡張機能の ID リスト。
+    //                            拡張機能同士の競合を防ぐため、インストール済みの場合に
+    //                            VS Code が無効化または削除を促す通知を表示します。
+    // ============================================================
+    "recommendations": [
+        // -------------------------------------------------------
+        // C / C++ 開発
+        // -------------------------------------------------------
+        // C/C++ IntelliSense・デバッグ・コード補完 (Microsoft 公式)
+        "ms-vscode.cpptools",
+        // C/C++ 拡張パック (cpptools + cmake-tools + themes をまとめてインストール)
+        "ms-vscode.cpptools-extension-pack",
+        // C/C++ エディタテーマ拡張
+        "ms-vscode.cpptools-themes",
+        // C/C++ 開発者ツール (DevTools 統合)
+        "ms-vscode.cpp-devtools",
+        // clangd ベースの高機能 C++ 言語サーバ (clang-tidy / clang-format 連携)
+        "llvm-vs-code-extensions.vscode-clangd",
+        // CMake サポート (CMakeLists.txt の IntelliSense・ビルド統合)
+        "ms-vscode.cmake-tools",
+        // -------------------------------------------------------
+        // C# / .NET 開発
+        // -------------------------------------------------------
+        // C# IntelliSense・デバッグ・リファクタリング (Microsoft 公式)
+        "ms-dotnettools.csharp",
+        // .NET SDK インストール管理 (C# 拡張の依存ランタイム)
+        "ms-dotnettools.vscode-dotnet-runtime",
+        // -------------------------------------------------------
+        // Python 開発
+        // -------------------------------------------------------
+        // Python IntelliSense・フォーマット・リンタ統合 (Microsoft 公式)
+        "ms-python.python",
+        // Python デバッグアダプタ (debugpy ベース)
+        "ms-python.debugpy",
+        // Python 仮想環境管理 UI
+        "ms-python.vscode-python-envs",
+        // -------------------------------------------------------
+        // Lua 開発
+        // -------------------------------------------------------
+        // Lua Language Server (EmmyLua 対応の高機能 Lua サポート)
+        "sumneko.lua",
+        // -------------------------------------------------------
+        // AI / Copilot
+        // -------------------------------------------------------
+        // GitHub Copilot チャット・インラインチャット機能
+        "github.copilot-chat",
+        // GitHub Pull Request・Issue 管理
+        "github.vscode-pull-request-github",
+        // -------------------------------------------------------
+        // Git / バージョン管理
+        // -------------------------------------------------------
+        // GitLens: Git ブレーム・履歴・差分の高度な可視化
+        "eamodio.gitlens",
+        // Git History: ブランチグラフ・コミット履歴ビューア
+        "donjayamanne.githistory",
+        // -------------------------------------------------------
+        // コード品質・フォーマット
+        // -------------------------------------------------------
+        // Prettier: JavaScript・TypeScript・JSON・Markdown などの自動フォーマット
+        "esbenp.prettier-vscode",
+        // スペルチェッカー (コード内の英単語スペルミスを検出)
+        "streetsidesoftware.code-spell-checker",
+        // インデントを色分けして可読性を向上
+        "oderwat.indent-rainbow",
+        // TODO コメントをツリービューで一覧管理
+        "gruntfuggly.todo-tree",
+        // TODO/FIXME ハイライト表示
+        "wayou.vscode-todo-highlight",
+        // Markdown Lint: Markdown ドキュメントのスタイルチェック
+        "DavidAnson.vscode-markdownlint",
+        // -------------------------------------------------------
+        // エディタ補助
+        // -------------------------------------------------------
+        // HTML タグの自動クローズ
+        "formulahendry.auto-close-tag",
+        // HTML タグのリネーム時に対応タグも自動更新
+        "formulahendry.auto-rename-tag",
+        // ファイルパス入力補完
+        "ionutvmi.path-autocomplete",
+        // クリップボード履歴管理
+        "anjali.clipboard-history",
+        // ブラケットペアのトグル表示
+        "dzhavat.bracket-pair-toggler",
+        // 全角スペースの可視化 (全角スペース混入バグ防止)
+        "mosapride.zenkaku",
+        // EditorConfig サポート (プロジェクトごとのコードスタイル設定を適用)
+        "EditorConfig.EditorConfig",
+        // -------------------------------------------------------
+        // データ・設定ファイル
+        // -------------------------------------------------------
+        // YAML 言語サポート (Red Hat 公式)
+        "redhat.vscode-yaml",
+        // XML 言語サポート
+        "dotjoshjohnson.xml",
+        // JSON 言語サポート強化
+        "zainchen.json",
+        // -------------------------------------------------------
+        // ダイアグラム・ドキュメント
+        // -------------------------------------------------------
+        // draw.io (diagrams.net) をエディタ内で編集
+        "hediet.vscode-drawio",
+        // Markdown オールインワン (目次生成・プレビュー・ショートカット)
+        "yzhang.markdown-all-in-one",
+        // -------------------------------------------------------
+        // ターミナル・スクリプト
+        // -------------------------------------------------------
+        // PowerShell スクリプトの IntelliSense・デバッグ
+        "ms-vscode.powershell",
+        // Batch ファイルの実行支援
+        "nilssoderman.batch-runner",
+        // -------------------------------------------------------
+        // 翻訳
+        // -------------------------------------------------------
+        // DeepL 翻訳をエディタ内から利用
+        "soerenuhrbach.vscode-deepl",
+        // -------------------------------------------------------
+        // テーマ・アイコン
+        // -------------------------------------------------------
+        // Material Icon Theme: ファイルツリーのアイコンセット
+        "pkief.material-icon-theme",
+        // VS Code Icons: 別のアイコンセット
+        "vscode-icons-team.vscode-icons"
+    ],
+    // このプロジェクトでは使ってほしくない拡張機能
+    // 拡張機能同士の競合防止に使う
+    "unwantedRecommendations": [
+        // CMake Tools 拡張と競合するため、CMake Tools Helper 拡張は推奨しない
+        "twxs.cmake-tools-helper"
+    ]
+}

@@ -1,0 +1,251 @@
+﻿# EditorConfig の設定方法はこちらを参照: https://editorconfig.org/
+
+# このファイルがリポジトリの最上位 EditorConfig であることを宣言する。
+# root = true により、上位ディレクトリの EditorConfig は読み込まれない。
+root = true
+
+# ---- 全ファイル共通設定 ----
+# ファイル末尾に改行を挿入し、インデントはスペース 4 つ、文字コードは UTF-8 とする。
+[*]
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+charset = utf-8
+
+# project.json はインデントを 2 スペースにする。
+[project.json]
+indent_size = 2
+
+# ---- C# ファイル設定 ----
+# BOM 付き UTF-8 を使用する。
+[*.cs]
+charset = utf-8-bom
+
+# 改行位置の設定: メソッド・ローカル関数の開き括弧は新しい行に置く。
+# else / catch / finally も新しい行に置く。
+# オブジェクト初期化子・匿名型・クエリ式の各メンバーも新しい行に置く。
+csharp_new_line_before_open_brace = methods, local_functions
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_within_query_expression_clauses = true
+
+# インデントの設定: ブロック内容・case 内容・switch ラベルをインデントし、
+# ブレース自体はインデントしない。ラベルは左端に揃える。
+csharp_indent_block_contents = true
+csharp_indent_braces = false
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_indent_labels = flush_left
+
+# ブレースの省略を禁止する。違反はエラーとして報告する。
+csharp_prefer_braces = true:error
+
+# this. 修飾子の使用を抑制する。不要な this. は警告として報告する。
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+# var の使用方針: 組み込み型には使用せず、型が明らかな場合のみ使用する。
+# それ以外の場面では強制しない。
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = true:none
+
+# BCL 型名 (System.Int32 等) ではなく言語キーワード (int 等) を使用する。
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:suggestion
+
+# 命名規則: const フィールドは PascalCase にする。違反は警告として報告する。
+dotnet_naming_rule.constant_fields_should_be_pascal_case.severity = warning
+dotnet_naming_rule.constant_fields_should_be_pascal_case.symbols  = constant_fields
+dotnet_naming_rule.constant_fields_should_be_pascal_case.style    = pascal_case_style
+
+dotnet_naming_symbols.constant_fields.applicable_kinds   = field
+dotnet_naming_symbols.constant_fields.required_modifiers = const
+
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+# 命名規則: private/internal の static フィールドは s_ プレフィックス + camelCase にする。
+dotnet_naming_rule.static_fields_should_have_prefix.severity = warning
+dotnet_naming_rule.static_fields_should_have_prefix.symbols  = static_fields
+dotnet_naming_rule.static_fields_should_have_prefix.style    = static_prefix_style
+
+dotnet_naming_symbols.static_fields.applicable_kinds   = field
+dotnet_naming_symbols.static_fields.required_modifiers = static
+dotnet_naming_symbols.static_fields.applicable_accessibilities = private, internal
+
+dotnet_naming_style.static_prefix_style.required_prefix = s_
+dotnet_naming_style.static_prefix_style.capitalization = camel_case
+
+# 命名規則: private/internal フィールドは _ プレフィックス + camelCase にする。
+dotnet_naming_rule.camel_case_for_private_internal_fields.severity = warning
+dotnet_naming_rule.camel_case_for_private_internal_fields.symbols  = private_internal_fields
+dotnet_naming_rule.camel_case_for_private_internal_fields.style    = camel_case_underscore_style
+
+dotnet_naming_symbols.private_internal_fields.applicable_kinds = field
+dotnet_naming_symbols.private_internal_fields.applicable_accessibilities = private, internal
+
+dotnet_naming_style.camel_case_underscore_style.required_prefix = _
+dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
+
+# コードスタイルのデフォルト設定:
+# System 名前空間の using を先頭にソートし、単一行ブロックを保持する。
+# 単一行ステートメントは複数行に展開する。
+dotnet_sort_system_directives_first = true
+csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_statements = false
+
+# 式レベルの設定: オブジェクト/コレクション初期化子・明示的なタプル名・
+# null 合体演算子・null 伝播演算子の使用を推奨する。
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_explicit_tuple_names = true:suggestion
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+
+# 式本体メンバーの設定:
+# メソッド・コンストラクタ・演算子は式本体を使用しない。
+# プロパティ・インデクサ・アクセサは式本体を許容する (強制しない)。
+csharp_style_expression_bodied_methods = false:none
+csharp_style_expression_bodied_constructors = false:none
+csharp_style_expression_bodied_operators = false:none
+csharp_style_expression_bodied_properties = true:none
+csharp_style_expression_bodied_indexers = true:none
+csharp_style_expression_bodied_accessors = true:none
+
+# パターンマッチングの設定: is + キャスト や as + null チェックより
+# パターンマッチング構文の使用を推奨する。インライン変数宣言も推奨する。
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+csharp_style_inlined_variable_declaration = true:suggestion
+
+# Null チェックの設定: throw 式およびデリゲートの条件付き呼び出しの使用を推奨する。
+csharp_style_throw_expression = true:suggestion
+csharp_style_conditional_delegate_call = true:suggestion
+
+# スペースの設定: キャスト後・ドット前後・カンマ前・セミコロン前など
+# 各種トークン周辺のスペース挿入ルールを定義する。
+csharp_space_after_cast = false
+csharp_space_after_colon_in_inheritance_clause = true
+csharp_space_after_comma = true
+csharp_space_after_dot = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_after_semicolon_in_for_statement = true
+csharp_space_around_binary_operators = before_and_after
+csharp_space_around_declaration_statements = do_not_ignore
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_before_comma = false
+csharp_space_before_dot = false
+csharp_space_before_open_square_brackets = false
+csharp_space_before_semicolon_in_for_statement = false
+csharp_space_between_empty_square_brackets = false
+csharp_space_between_method_call_empty_parameter_list_parentheses = false
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+csharp_space_between_method_declaration_name_and_open_parenthesis = false
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_parentheses = false
+csharp_space_between_square_brackets = false
+
+
+# ---- YAML ファイル設定 ----
+# インデントを 2 スペースにする。
+[*.yml]
+indent_size = 2
+
+# ---- XAML ファイル設定 ----
+# BOM 付き UTF-8 を使用する。
+[*.xaml]
+charset = utf-8-bom
+
+# ---- C/C++ ファイル設定 ----
+# 【優先順位について】
+# .clang-format が存在する場合、コードフォーマット (字下げ・括弧位置・スペース等) は
+# .clang-format の設定が優先して適用される。
+# .editorconfig の cpp_* フォーマット設定は Visual Studio の組み込みフォーマッタ向けであり、
+# clang-format が有効な環境では実質的に無視される。
+# charset / insert_final_newline 等の基本エディタ設定は .editorconfig が引き続き有効。
+#
+# BOM 付き UTF-8 を使用し、ドキュメントコメントは Doxygen の /// 形式で生成する。
+[*.{c,cpp,h,hpp,inl}]
+charset = utf-8-bom
+cpp_generate_documentation_comments = doxygen_triple_slash
+
+# C++ フォーマット設定 (Visual Studio C++ フォーマッタ向け):
+# 名前空間・型・関数・ブロックの開き括弧はすべて新しい行に置く。
+# catch / else も新しい行に置く。
+cpp_new_line_before_open_brace_namespace = new_line
+cpp_new_line_before_open_brace_type = new_line
+cpp_new_line_before_open_brace_function = new_line
+cpp_new_line_before_open_brace_block = new_line
+cpp_new_line_before_catch = true
+cpp_new_line_before_else = true
+
+# インデントの設定: ブレース自体はインデントしない。case 内容・名前空間内容はインデントし、
+# case ラベル自体は switch に揃える。
+cpp_indent_braces = false
+cpp_indent_case_contents = true
+cpp_indent_case_labels = false
+cpp_indent_namespace_contents = true
+
+# スペースの設定: 関数名と括弧の間にスペースを入れない。
+# 括弧内・制御フロー括弧内・カンマ前にスペースを入れない。
+# ブロック開き括弧前・カンマ後・代入/二項演算子周辺にスペースを入れる。
+# ポインタ/参照の * / & は左寄せにする。
+cpp_space_before_function_open_parenthesis = remove
+cpp_space_within_parameter_list_parentheses = false
+cpp_space_within_control_flow_statement_parentheses = false
+cpp_space_before_block_open_brace = true
+cpp_space_before_comma = false
+cpp_space_after_comma = true
+cpp_space_around_assignment_operator = insert
+cpp_space_around_binary_operator = insert
+cpp_space_pointer_reference_alignment = left
+
+# Include Cleanup 設定: 足りない #include の追加・不要な #include の削除を
+# 提案 (suggestion) レベルで報告する。
+# 詳細は https://learn.microsoft.com/ja-jp/cpp/ide/include-cleanup-config?view=msvc-170#configure-include-cleanup-with-editorconfig
+cpp_include_cleanup_add_missing_error_tag_type = suggestion
+cpp_include_cleanup_remove_unused_error_tag_type = suggestion
+
+
+# EASTL などヘッダーの代替ファイルマッピング。
+# Include Cleanup が誘導する内部ヘッダーの代わりに公開 API ヘッダーを使用するよう記述する。
+cpp_include_cleanup_alternate_files = EASTL/atomic.h:EASTL/internal/atomic/atomic.h
+#include <EASTL/internal/copy_help.h>
+#include <EASTL/internal/enable_shared.h>
+cpp_include_cleanup_alternate_files = EASTL/functional.h:EASTL/internal/function.h
+#include <EASTL/internal/hashtable.h>
+cpp_include_cleanup_alternate_files = EASTL/utility.h:EASTL/internal/move_help.h
+cpp_include_cleanup_alternate_files = algorithm:__algorithm/max.h
+cpp_include_cleanup_alternate_files = algorithm:__algorithm/min.h
+cpp_include_cleanup_alternate_files = type_traits:__type_traits/integral_constant.h
+
+# ---- XML プロジェクトファイル設定 ----
+# .csproj / .vcxproj 等のプロジェクトファイルはインデントを 2 スペースにする。
+[*.{csproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj}]
+indent_size = 2
+
+# .builds ファイルはインデントを 2 スペースにする。
+[*.builds]
+indent_size = 2
+
+# 一般 XML ファイルはインデントを 2 スペースにする。
+[*.{xml,stylecop,resx,ruleset}]
+indent_size = 2
+
+# XML 設定ファイル (.props / .targets / .config / .nuspec) はインデントを 2 スペースにする。
+[*.{props,targets,config,nuspec}]
+indent_size = 2
+
+# ---- シェルスクリプト設定 ----
+# sh スクリプトは LF 改行、Windows バッチファイルは CRLF 改行を使用する。
+[*.sh]
+end_of_line = lf
+[*.{cmd, bat}]
+end_of_line = crlf

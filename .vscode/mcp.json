@@ -1,0 +1,52 @@
+{
+    "inputs": [
+        // {
+        //     "id": "githubToken",
+        //     "type": "promptString",
+        //     "description": "GitHub Personal Access Token",
+        //     "password": true
+        // },
+        // {
+        //     "id": "myApiKey",
+        //     "type": "promptString",
+        //     "description": "My API Key",
+        //     "password": true       // true にすると入力値がマスクされる
+        // },
+        // {
+        //     "id": "myApiEndpoint",
+        //     "type": "promptString",
+        //     "description": "API Endpoint URL",
+        //     "default": "https://api.example.com"
+        // }
+    ],
+    "servers": {
+        // "github": {
+        //     "type": "stdio",
+        //     "command": "npx",
+        //     "args": ["-y", "@modelcontextprotocol/server-github"],
+        //     "env": {
+        //         "GITHUB_PERSONAL_ACCESS_TOKEN": "${input:githubToken}"
+        //     }
+        // },
+        // "filesystem": {
+        //     "type": "stdio",
+        //     "command": "npx",
+        //     "args": [
+        //         "-y",
+        //         "@modelcontextprotocol/server-filesystem",
+        //         "${workspaceFolder}"
+        //     ]
+        // },
+        // --- inputs を使うサンプル ---
+        // サーバ起動時に VS Code がユーザへ入力を求め、環境変数として渡す例
+        // "my-api-server": {
+        //     "type": "stdio",
+        //     "command": "node",
+        //     "args": ["path/to/server.js"],
+        //     "env": {
+        //         "API_KEY":      "${input:myApiKey}",
+        //         "API_ENDPOINT": "${input:myApiEndpoint}"
+        //     }
+        // }
+    }
+}

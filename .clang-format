@@ -1,0 +1,100 @@
+---
+# Default
+# すべての言語セクションに適用される基本設定
+
+# WebKit コーディングスタイルをベースとして採用
+BasedOnStyle: WebKit
+
+# インデント幅: スペース4つ
+IndentWidth: 4
+
+# タブ文字の表示幅: 4スペース相当
+TabWidth: 4
+
+# タブ文字は使用せず、常にスペースで展開する
+UseTab: Never
+---
+# C++
+# C++ ファイルにのみ適用される設定
+
+# 対象言語を C++ に指定
+Language: Cpp
+
+# 使用する C++ 言語規格 (C++20)
+Standard: c++20
+
+# 開き括弧の直後で引数が折り返された場合、開き括弧の位置に揃える
+# 例:
+#   func(arg1,
+#        arg2);
+AlignAfterOpenBracket: Align
+
+# 複数行にわたる二項演算子のオペランドを縦に揃える
+# 例:
+#   int a = longVariableName
+#         + anotherLongVariable;
+AlignOperands: true
+
+# 同ブロック内の行末コメント (//) を縦に揃える
+AlignTrailingComments: true
+
+# 短いブロック ({ ... }) を1行にまとめることを禁止する
+# 例: if (x) { return; } を許可しない
+AllowShortBlocksOnASingleLine: false
+
+# 短い関数本体を1行にまとめることを禁止する
+# 例: void f() { return; } を許可しない
+AllowShortFunctionsOnASingleLine: false
+
+# テンプレート宣言 (template<...>) の後は常に改行する
+# 例:
+#   template <typename T>
+#   void func();
+AlwaysBreakTemplateDeclarations: true
+
+# 波括弧のスタイル: Stroustrup (K&R の変形)
+# - 関数・クラスの開き括弧は同一行
+# - else / catch は閉じ括弧と同じ行に置かない
+# 例:
+#   if (x) {
+#       ...
+#   }
+#   else {
+#       ...
+#   }
+BreakBeforeBraces: Stroustrup
+
+# 1行の最大文字数制限なし (0 = 無制限)
+ColumnLimit: 0
+
+# 連続する空行の最大保持数
+MaxEmptyLinesToKeep: 2
+
+# namespace ブロック内のインデントを行わない
+# 例:
+#   namespace Foo {
+#   void func();  // インデントしない
+#   }
+NamespaceIndentation: None
+
+# namespace の閉じ括弧に対するコメントを自動補完・修正する
+# 例: } → } // namespace Foo
+FixNamespaceComments: true
+
+# FixNamespaceComments が適用されない「短い namespace」の行数閾値
+# 0 にすることですべての namespace にコメント補完を強制する
+ShortNamespaceLines: 0
+
+# #include ディレクティブの自動ソートを無効化する
+# プロジェクト固有のインクルード順序を維持するため
+SortIncludes: false
+
+# C++11 波括弧初期化リストの直前にスペースを入れない
+# 例: vector<int>{1, 2} (スペースなし)
+SpaceBeforeCpp11BracedList: false
+
+# 括弧前のスペースは制御文 (if/for/while 等) にのみ挿入する
+# 例: if (x) ... / func(x) (関数呼び出しはスペースなし)
+SpaceBeforeParens: ControlStatements
+---
+# Other languages if available

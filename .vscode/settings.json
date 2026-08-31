@@ -1,0 +1,60 @@
+{
+    // -------------------------------------------------------------------------
+    // CMake 設定
+    // -------------------------------------------------------------------------
+    // ビルドシステムに Ninja を使用する
+    "cmake.generator": "Ninja",
+    // CMake のビルド出力先ディレクトリ
+    "cmake.buildDirectory": "${workspaceFolder}/Intermediate/Build/CMake",
+    // ビルドツールへの追加引数（-v: 詳細ログ出力）
+    "cmake.buildToolArgs": [
+        "-v"
+    ],
+    // CMake 設定時の追加引数（未使用変数の警告を抑制）
+    "cmake.configureArgs": [
+        "--no-warn-unused-cli"
+    ],
+    // ワークスペースを開いた際に自動で CMake 設定を実行する
+    "cmake.configureOnOpen": true,
+    // -------------------------------------------------------------------------
+    // C/C++ 設定
+    // -------------------------------------------------------------------------
+    // IntelliSense の構成プロバイダーとして cmake-tools を使用する
+    "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
+    // -------------------------------------------------------------------------
+    // Python 設定
+    // -------------------------------------------------------------------------
+    // プロジェクト内の venv 環境の Python インタープリターを使用する
+    "python.defaultInterpreterPath": "${workspaceFolder}/Package/Installed/venv/Scripts/python.exe",
+    // Python 仮想環境の設定（venv + pip）
+    "python-envs.pythonProjects": [
+        {
+            "path": "",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        }
+    ],
+    // -------------------------------------------------------------------------
+    // フォーマッター設定
+    // -------------------------------------------------------------------------
+    // clang-format のスタイル設定を .clang-format ファイルから読み込む
+    "C_Cpp.clang_format_style": "file",
+    // フォールバック用のスタイルは使用しない
+    "C_Cpp.clang_format_fallbackStyle": "none",
+    // 保存時に自動フォーマットを実行する
+    "editor.formatOnSave": true,
+    // デフォルトのフォーマッターに cpptools を使用する
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    // C++ ファイルのフォーマッターは clangd を使用する
+    "[cpp]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+    },
+    // C ファイルのフォーマッターは cpptools を使用する
+    "[c]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    // JSONC ファイルのフォーマッターは組み込みの json-language-features を使用する
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    }
+}
