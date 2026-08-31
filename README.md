@@ -1,1 +1,1 @@
-# ActiveWindowLauncher
+# KActiveWindowLauncher
