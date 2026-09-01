@@ -49,6 +49,23 @@ KActiveWindowLauncher/
 - 実装方針の要点は [doc/adr](doc/adr) を確認してください。
 - 機能要件や移植仕様は [doc/spec/active-window-launcher-migration-spec.md](doc/spec/active-window-launcher-migration-spec.md) を参照してください。
 
+## ビルド / 起動バッチ
+
+リポジトリ直下で、以下のバッチファイルを利用できます。
+
+- デバッグビルド
+  - `build-kactive-window-launcher-debug.bat`
+  - 実行内容: `npm run tauri:build -- --debug`
+- リリースビルド
+  - `build-kactive-window-launcher-release.bat`
+  - 実行内容: `npm run tauri:build`
+- デバッグ起動
+  - `run-kactive-window-launcher-debug.bat`
+  - 実行内容: `npm run tauri:dev`
+- リリース起動
+  - `run-kactive-window-launcher-release.bat`
+  - `src-tauri\target\release\app.exe` が存在しない場合は、先に `build-kactive-window-launcher-release.bat` を実行してから起動します。
+
 ## 今後の方針
 
 このリポジトリは、設計・仕様の整理を先行させたうえで、実装フェーズに進める構成です。各種設計書をもとに、Tauri アプリの実装を段階的に進めていく想定です。
