@@ -10,6 +10,8 @@ export type DataType =
   | 'cpl'
   | 'otherApp';
 
+export type ThemeType = 'classic' | 'dark' | 'light';
+
 export interface LauncherSlot {
   index: number;
   dataType: DataType;
@@ -21,6 +23,7 @@ export interface LauncherSlot {
 
 export interface LauncherSettings {
   version: number;
+  theme: ThemeType;
   slots: LauncherSlot[];
 }
 
@@ -40,6 +43,7 @@ export function createEmptySlot(index: number): LauncherSlot {
 export function createDefaultSettings(): LauncherSettings {
   return {
     version: 1,
+    theme: 'classic',
     slots: Array.from({ length: SLOT_COUNT }, (_, index) => createEmptySlot(index)),
   };
 }

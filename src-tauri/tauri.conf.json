@@ -13,9 +13,13 @@
     "windows": [
       {
         "title": "KActiveWindowLauncher",
-        "width": 800,
-        "height": 600,
-        "resizable": true,
+        "width": 960,
+        "height": 124,
+        "resizable": false,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
         "fullscreen": false
       }
     ],

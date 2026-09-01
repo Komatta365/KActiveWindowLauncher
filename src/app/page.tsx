@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { type DragEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 
-import { createDefaultSettings, type DataType, type LauncherSettings, type LauncherSlot, SLOT_COUNT } from '@/lib/launcher';
+import { createDefaultSettings, type DataType, type LauncherSettings, type LauncherSlot } from '@/lib/launcher';
 
 const slotIcons: Record<DataType, string> = {
   none: '＋',
@@ -26,11 +26,17 @@ const slotLabel = (slot: LauncherSlot) => {
   return slot.path.split(/[\\/]/).pop() || slot.dataType;
 };
 
+const SLOT_BUTTON_PITCH = 36;
+const SYSTEM_BAR_WIDTH = 180;
+
 export default function HomePage() {
   const [settings, setSettings] = useState<LauncherSettings>(createDefaultSettings());
+  const [slotStartIndex, setSlotStartIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [tracked, setTracked] = useState(false);
-  const [activeEdit, setActiveEdit] = useState<LauncherSlot | null>(null);
+  const [trackedWidth, setTrackedWidth] = useState(960);
+  const [locked, setLocked] = useState(false);
+  const [slotRowWidth, setSlotRowWidth] = useState(0);
+  const slotRowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -45,50 +51,97 @@ export default function HomePage() {
 
     void loadSettings();
 
-    const unlistenWindowTracked = listen<{ visible: boolean }>('launcher://window-tracked', (event) => {
-      setTracked(Boolean(event.payload.visible));
+    const unlistenWindowTracked = listen<{ visible: boolean; width: number }>('launcher://window-tracked', (event) => {
+      if (event.payload.visible) {
+        setTrackedWidth(event.payload.width);
+      }
     });
 
-    const unlistenReferenceChanged = listen<{ hwnd: string | null; locked: boolean }>('launcher://reference-window-changed', () => {
-      // 監視中の参照ウィンドウ状態に合わせて UI を更新する。
-    });
+    const unlistenReferenceChanged = listen<{ hwnd: string | null; locked: boolean }>(
+      'launcher://reference-window-changed',
+      (event) => {
+        setLocked(Boolean(event.payload.locked));
+      },
+    );
 
     const unlistenTrackingError = listen<{ message: string }>('launcher://tracking-error', (event) => {
       setError(event.payload.message);
     });
 
-    void Promise.all([unlistenWindowTracked, unlistenReferenceChanged, unlistenTrackingError]).catch(() => undefined);
+    const unlistenSettingsUpdated = listen('launcher://settings-updated', async () => {
+      try {
+        const loaded = await invoke<LauncherSettings>('settings_load');
+        setSettings(loaded);
+      } catch (e) {
+        setError(String(e));
+      }
+    });
+
+    void Promise.all([unlistenWindowTracked, unlistenReferenceChanged, unlistenTrackingError, unlistenSettingsUpdated]).catch(() => undefined);
 
     void invoke('launcher_init').catch((e) => setError(String(e)));
   }, []);
 
-  const bars = useMemo(() => settings.slots, [settings.slots]);
+  useEffect(() => {
+    const row = slotRowRef.current;
+    if (!row) {
+      return;
+    }
 
-  const saveSettings = async (nextSettings: LauncherSettings) => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? 0;
+      setSlotRowWidth(width);
+    });
+    resizeObserver.observe(row);
+    setSlotRowWidth(row.clientWidth);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  const visibleSlotCount = useMemo(
+    () => {
+      const availableWidth = slotRowWidth > 0 ? slotRowWidth : Math.max(trackedWidth - SYSTEM_BAR_WIDTH, 0);
+      return Math.max(1, Math.min(settings.slots.length, Math.floor(availableWidth / SLOT_BUTTON_PITCH)));
+    },
+    [settings.slots.length, slotRowWidth, trackedWidth],
+  );
+
+  const visibleSlots = useMemo(
+    () => settings.slots.slice(slotStartIndex, slotStartIndex + visibleSlotCount),
+    [settings.slots, slotStartIndex, visibleSlotCount],
+  );
+
+  const updateSlotByPath = async (slotIndex: number, path: string) => {
+    const dataType = (await invoke<DataType>('path_detect_data_type', { path })) || 'none';
+    const nextSlot: LauncherSlot = {
+      index: slotIndex,
+      dataType,
+      path,
+      arg: '',
+      comment: '',
+      exist: Boolean(path) && (await invoke<boolean>('path_exists', { path, dataType })),
+    };
+    const nextSettings = {
+      ...settings,
+      slots: settings.slots.map((item) => (item.index === slotIndex ? nextSlot : item)),
+    };
     setSettings(nextSettings);
+    await invoke('settings_save', { settings: nextSettings });
+  };
+
+  const openSlotEditor = async (slotIndex: number) => {
     try {
-      await invoke('settings_save', { settings: nextSettings });
+      await invoke('launcher_open_slot_editor', { index: slotIndex });
     } catch (e) {
       setError(String(e));
     }
   };
 
-  const updateSlot = async (slot: LauncherSlot) => {
-    const next = {
-      ...settings,
-      slots: settings.slots.map((item) => (item.index === slot.index ? slot : item)),
-    };
-    await saveSettings(next);
-  };
-
   const handleSlotClick = async (slot: LauncherSlot) => {
-    if (slot.dataType === 'none') {
-      setActiveEdit({ ...slot });
-      return;
-    }
-
-    if (!slot.exist) {
-      setActiveEdit({ ...slot });
+    if (slot.dataType === 'none' || !slot.exist) {
+      await openSlotEditor(slot.index);
       return;
     }
 
@@ -99,136 +152,125 @@ export default function HomePage() {
     }
   };
 
-  const handleSaveEdit = async () => {
-    if (!activeEdit) {
+  const handleDragDrop = async (slot: LauncherSlot, event: DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const text = event.dataTransfer.getData('text/uri-list') || event.dataTransfer.getData('text/plain');
+    const fileList = Array.from(event.dataTransfer.files);
+    const firstFile = fileList[0] as (File & { path?: string }) | undefined;
+    const sourcePath = firstFile?.path || text.trim();
+
+    if (!sourcePath) {
       return;
     }
 
-    const dataType = await invoke<DataType>('path_detect_data_type', { path: activeEdit.path || '' });
-    const nextSlot: LauncherSlot = {
-      ...activeEdit,
-      dataType: activeEdit.path ? dataType : 'none',
-      exist: Boolean(activeEdit.path) && (await invoke<boolean>('path_exists', { path: activeEdit.path, dataType })),
-    };
+    const withoutProtocol = sourcePath.replace(/^file:\/\//i, '');
+    const normalizedPath = withoutProtocol.replace(/^file:\//i, '');
 
-    await updateSlot(nextSlot);
-    setActiveEdit(null);
+    if (slot.dataType === 'none') {
+      await updateSlotByPath(slot.index, normalizedPath);
+      return;
+    }
+
+    const droppedArg = /\s/.test(normalizedPath) ? `"${normalizedPath}"` : normalizedPath;
+    await invoke('slot_execute', { index: slot.index, droppedArg });
   };
 
-  const handleClearEdit = async () => {
-    if (!activeEdit) return;
-    const nextSlot: LauncherSlot = {
-      ...activeEdit,
-      dataType: 'none',
-      path: '',
-      arg: '',
-      comment: '',
-      exist: false,
-    };
-    await updateSlot(nextSlot);
-    setActiveEdit(null);
+  const hideToTray = async () => {
+    try {
+      await invoke('launcher_hide_to_tray');
+    } catch (e) {
+      setError(String(e));
+    }
   };
+
+  const toggleLock = async () => {
+    try {
+      if (locked) {
+        await invoke('launcher_stop_tracking');
+      } else {
+        await invoke('launcher_start_tracking');
+      }
+    } catch (e) {
+      setError(String(e));
+    }
+  };
+
+  const scrollSlots = (direction: number) => {
+    const nextIndex = slotStartIndex + direction * visibleSlotCount;
+    setSlotStartIndex(Math.min(Math.max(nextIndex, 0), Math.max(settings.slots.length - visibleSlotCount, 0)));
+  };
+
+  useEffect(() => {
+    setSlotStartIndex((current) => Math.min(current, Math.max(settings.slots.length - visibleSlotCount, 0)));
+  }, [settings.slots.length, visibleSlotCount]);
 
   return (
-    <main className="page">
+    <main className="page" data-theme={settings.theme}>
       <div className="launcher-shell">
-        <header className="launcher-header">
-          <h1 className="header-title">KActiveWindowLauncher</h1>
-          <div className="header-actions">
-            <span className="status-pill">
-              <span className="dot" />
-              {tracked ? 'Tracking' : 'Standby'}
-            </span>
-            <button className="icon-button primary" type="button" onClick={() => void invoke('launcher_start_tracking')}>
-              Lock
-            </button>
-            <button className="icon-button" type="button" onClick={() => void invoke('launcher_stop_tracking')}>
-              Stop
-            </button>
-          </div>
-        </header>
+        <div className="launcher-bar">
+          <button
+            className={`system-button system-button-icon system-button-lock ${locked ? 'active' : ''}`}
+            type="button"
+            onClick={() => void toggleLock()}
+            aria-label={locked ? 'Unlock' : 'Lock'}
+            title={locked ? 'Unlock' : 'Lock'}
+          >
+            <span className="system-button-image" aria-hidden="true" />
+          </button>
+          <button
+            className="system-button system-button-icon system-button-left"
+            type="button"
+            onClick={() => scrollSlots(-1)}
+            aria-label="Move left"
+            title="Move left"
+            disabled={slotStartIndex <= 0}
+          >
+            <span className="system-button-image" aria-hidden="true" />
+          </button>
+          <button
+            className="system-button system-button-icon system-button-right"
+            type="button"
+            onClick={() => scrollSlots(1)}
+            aria-label="Move right"
+            title="Move right"
+            disabled={slotStartIndex + visibleSlotCount >= settings.slots.length}
+          >
+            <span className="system-button-image" aria-hidden="true" />
+          </button>
 
-        {error ? <div className="message">{error}</div> : null}
-
-        <div className="bar">
-          <button className="icon-button" type="button" aria-label="Move left">←</button>
-          <button className="icon-button" type="button" aria-label="Move right">→</button>
-          <button className="icon-button" type="button" aria-label="Close">×</button>
-        </div>
-
-        <div className="slot-grid">
-          {bars.map((slot) => (
-            <button
-              key={slot.index}
-              type="button"
-              className={`slot ${slot.dataType === 'none' ? 'empty' : ''} ${slot.exist === false && slot.dataType !== 'none' ? 'invalid' : ''}`}
-              onClick={() => void handleSlotClick(slot)}
-              onContextMenu={(event) => {
-                event.preventDefault();
-                setActiveEdit({ ...slot });
-              }}
-            >
-              <span className="slot-label">{slot.index + 1}</span>
-              <span className="slot-content">
+          <div className="slot-row" ref={slotRowRef}>
+            {visibleSlots.map((slot) => (
+              <button
+                key={slot.index}
+                type="button"
+                className={`slot ${slot.dataType === 'none' ? 'empty' : ''} ${slot.exist === false && slot.dataType !== 'none' ? 'invalid' : ''}`}
+                onClick={() => void handleSlotClick(slot)}
+                onContextMenu={(event) => {
+                  event.preventDefault();
+                  void openSlotEditor(slot.index);
+                }}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => void handleDragDrop(slot, event)}
+              >
+                <span className="slot-label">{slot.index + 1}</span>
                 <span className="slot-icon">{slotIcons[slot.dataType]}</span>
                 <span className="slot-name">{slot.dataType === 'none' ? 'Empty' : slotLabel(slot)}</span>
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {activeEdit ? (
-        <div className="dialog-backdrop" onClick={() => setActiveEdit(null)}>
-          <div className="dialog" onClick={(event) => event.stopPropagation()}>
-            <div className="dialog-header">
-              <strong>Slot {activeEdit.index + 1}</strong>
-              <button type="button" className="secondary-button" onClick={() => setActiveEdit(null)}>
-                Close
               </button>
-            </div>
-            <div className="dialog-body">
-              <div className="form-row">
-                <label>Path</label>
-                <input
-                  value={activeEdit.path}
-                  onChange={(event) => setActiveEdit({ ...activeEdit, path: event.target.value })}
-                  placeholder="C:\\path\\to\\target"
-                />
-              </div>
-              <div className="form-row">
-                <label>Arguments</label>
-                <input
-                  value={activeEdit.arg}
-                  onChange={(event) => setActiveEdit({ ...activeEdit, arg: event.target.value })}
-                  placeholder="Optional arguments"
-                />
-              </div>
-              <div className="form-row">
-                <label>Comment</label>
-                <textarea
-                  value={activeEdit.comment}
-                  onChange={(event) => setActiveEdit({ ...activeEdit, comment: event.target.value })}
-                  placeholder="Comment to display in tooltip"
-                />
-              </div>
-            </div>
-            <div className="dialog-footer">
-              <button type="button" className="danger-button" onClick={() => void handleClearEdit()}>
-                Clear
-              </button>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button type="button" className="secondary-button" onClick={() => setActiveEdit(null)}>
-                  Cancel
-                </button>
-                <button type="button" className="primary-button" onClick={() => void handleSaveEdit()}>
-                  Save
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
+          <button
+            className="system-button system-button-icon system-button-close"
+            type="button"
+            onClick={() => void hideToTray()}
+            aria-label="Close"
+            title="Close"
+          >
+            <span className="system-button-image" aria-hidden="true" />
+          </button>
         </div>
-      ) : null}
+
+        {error ? <div className="message">{error}</div> : null}
+      </div>
     </main>
   );
 }

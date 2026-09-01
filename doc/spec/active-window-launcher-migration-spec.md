@@ -84,12 +84,15 @@ interface LauncherSettings {
    - ツールウィンドウ/子ウィンドウ/Caption無しなど不適合ウィンドウ
 3. 追従先が有効な場合、対象矩形上辺へバーを配置する。
 4. 追従先が無効な場合、バーを非表示（opacity 0 / hidden）にする。
+5. 追従処理は Rust 側で実行し、`launcher://window-tracked` を毎 tick 通知する。
+6. 配置時は追従対象ウィンドウの横幅にランチャー横幅を一致させ、上辺に吸着させる。
 
 ### FR-02 ロック
 - `isLocked=false`:
   - 規定フレーム数（3）連続で対象が変わった時のみ参照先更新（ちらつき抑制）
 - `isLocked=true`:
-  - 参照先を固定し、Zオーダー調整のみ実施
+  - 参照先を固定し、追従先変更を停止する
+  - ランチャーは参照ウィンドウ上辺への配置は継続する
 
 ### FR-03 スロット管理
 - スロット数は 64 固定。
@@ -99,7 +102,9 @@ interface LauncherSettings {
 ### FR-04 実行
 - 左クリック:
   - `dataType != none` かつ `exist=true` の場合のみ実行
-  - それ以外は編集ダイアログ
+  - それ以外はショートカット編集ダイアログ（独立ウィンドウ）を開く
+- 右クリック:
+  - 常にショートカット編集ダイアログ（独立ウィンドウ）を開く
 - 既存スロットへのドロップ実行引数:
   - ドロップパスに空白がある場合、二重引用符でラップして渡す
 - DataType 別実行:
@@ -123,8 +128,15 @@ interface LauncherSettings {
 
 ### FR-07 タスクトレイ
 - Close ボタン押下は終了せず `tray` へ格納
+- ウィンドウ右上の閉じる操作も終了せず `tray` へ格納
+- トレイアイコン左クリックでメニューを表示（表示 / 非表示 / 設定 / 終了）
 - トレイアイコンダブルクリックで再表示
 - トレイメニュー「終了」でアプリ終了
+
+### FR-09 設定ダイアログ
+- トレイメニュー「設定」で設定ダイアログを表示する
+- 設定ダイアログでテーマを選択・保存できる
+- テーマは `classic | dark | light` をサポートし、設定保存で永続化する
 
 ### FR-08 永続化・復旧
 1. 起動時:
@@ -180,6 +192,17 @@ invoke("slot_execute", {
 invoke("path_detect_data_type", { path }: { path: string }): Promise<DataType>
 invoke("path_exists", { path, dataType }: { path: string; dataType: DataType }): Promise<boolean>
 ```
+
+### 8.2 現行実装での監視・ロック意味
+- `launcher_init`
+  - Win32 監視スレッドを起動する（100ms tick）
+  - 起動後は常時監視を継続する
+- `launcher_start_tracking`
+  - ロック状態へ遷移 (`locked=true`)
+  - 参照ウィンドウの変更を止める
+- `launcher_stop_tracking`
+  - アンロック状態へ遷移 (`locked=false`)
+  - 規定フレーム数判定で参照ウィンドウ追従を再開する
 
 ### 8.1 フロントへ通知するイベント
 - `launcher://window-tracked`
